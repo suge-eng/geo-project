@@ -1,0 +1,38 @@
+# Compiled class files
+*.class
+
+# Maven build output
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Docker data
+docker-data/
+
+# Log files
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database files
+*.db
+*.sock
+
+# Maven wrapper
+!mvnw
+!mvnw.cmd
+.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot configuration
+application-local.yml
+application-local.properties

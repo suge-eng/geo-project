@@ -1,0 +1,67 @@
+package com.geo.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.LocalDateTime;
+
+public class TaskResultVO {
+
+    private Long id;
+    private String aiPlatform;
+    private String aiDisplayName;
+    private String questionText;
+    private String answerText;
+    private String screenshotUrl;
+    private String status;
+    private String errorMsg;
+    private Long durationMs;
+    private Integer rpaRetryCount;
+    private LocalDateTime createdAt;
+    private LocalDateTime completedAt;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getAiPlatform() { return aiPlatform; }
+    public void setAiPlatform(String aiPlatform) { this.aiPlatform = aiPlatform; }
+    public String getAiDisplayName() { return aiDisplayName; }
+    public void setAiDisplayName(String aiDisplayName) { this.aiDisplayName = aiDisplayName; }
+    public String getQuestionText() { return questionText; }
+    public void setQuestionText(String questionText) { this.questionText = questionText; }
+    public String getAnswerText() { return answerText; }
+    public void setAnswerText(String answerText) { this.answerText = answerText; }
+    public String getScreenshotUrl() { return screenshotUrl; }
+    public void setScreenshotUrl(String screenshotUrl) { this.screenshotUrl = screenshotUrl; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getErrorMsg() { return errorMsg; }
+    public void setErrorMsg(String errorMsg) { this.errorMsg = errorMsg; }
+    public Long getDurationMs() { return durationMs; }
+    public void setDurationMs(Long durationMs) { this.durationMs = durationMs; }
+    public Integer getRpaRetryCount() { return rpaRetryCount; }
+    public void setRpaRetryCount(Integer rpaRetryCount) { this.rpaRetryCount = rpaRetryCount; }
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    public LocalDateTime getCompletedAt() { return completedAt; }
+    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+
+    public static Builder builder() { return new Builder(); }
+
+    public static class Builder {
+        private final TaskResultVO vo = new TaskResultVO();
+        public Builder id(Long id) { vo.setId(id); return this; }
+        public Builder aiPlatform(String aiPlatform) { vo.setAiPlatform(aiPlatform); return this; }
+        public Builder aiDisplayName(String aiDisplayName) { vo.setAiDisplayName(aiDisplayName); return this; }
+        public Builder questionText(String questionText) { vo.setQuestionText(questionText); return this; }
+        public Builder answerText(String answerText) { vo.setAnswerText(answerText); return this; }
+        public Builder screenshotUrl(String screenshotUrl) { vo.setScreenshotUrl(screenshotUrl); return this; }
+        public Builder status(String status) { vo.setStatus(status); return this; }
+        public Builder errorMsg(String errorMsg) { vo.setErrorMsg(errorMsg); return this; }
+        public Builder durationMs(Long durationMs) { vo.setDurationMs(durationMs); return this; }
+        public Builder rpaRetryCount(Integer rpaRetryCount) { vo.setRpaRetryCount(rpaRetryCount); return this; }
+        public Builder createdAt(LocalDateTime createdAt) { vo.setCreatedAt(createdAt); return this; }
+        public Builder completedAt(LocalDateTime completedAt) { vo.setCompletedAt(completedAt); return this; }
+        public TaskResultVO build() { return vo; }
+    }
+}
