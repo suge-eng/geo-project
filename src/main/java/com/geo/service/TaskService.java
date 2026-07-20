@@ -15,6 +15,9 @@ import com.geo.mapper.TaskAiMapper;
 import com.geo.mapper.TaskMapper;
 import com.geo.mapper.TaskQuestionMapper;
 import com.geo.mapper.TaskResultMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
@@ -38,21 +40,26 @@ public class TaskService {
     private final TaskQuestionMapper taskQuestionMapper;
     private final TaskResultMapper taskResultMapper;
     private final RpaDispatchService rpaDispatchService;
+    private final ObjectMapper objectMapper;
 
     public TaskService(TaskMapper taskMapper, TaskAiMapper taskAiMapper,
                        TaskQuestionMapper taskQuestionMapper, TaskResultMapper taskResultMapper,
-                       RpaDispatchService rpaDispatchService) {
+                       RpaDispatchService rpaDispatchService, ObjectMapper objectMapper) {
         this.taskMapper = taskMapper;
         this.taskAiMapper = taskAiMapper;
         this.taskQuestionMapper = taskQuestionMapper;
         this.taskResultMapper = taskResultMapper;
         this.rpaDispatchService = rpaDispatchService;
+        this.objectMapper = objectMapper;
     }
 
     @Transactional
-    public Task createTask(List<String> aiPlatforms, List<String> questions, String title) {
+    public Task createTask(List<String> aiPlatforms, List<String> questions, String title,
+                          String brandName, List<String> competitors, 
+                          String executionFrequency, Boolean retryOnFailure) {
         validateAiPlatforms(aiPlatforms);
         validateQuestions(questions);
+        validateBrandName(brandName);
 
         String taskNo = generateTaskNo();
         Task task = new Task();
@@ -65,12 +72,14 @@ public class TaskService {
         task.setTotalCount(aiPlatforms.size() * questions.size());
         task.setCompletedCount(0);
         task.setFailedCount(0);
+        
         taskMapper.insert(task);
 
         saveTaskAis(task.getId(), taskNo, aiPlatforms);
         List<TaskQuestion> savedQuestions = saveTaskQuestions(task.getId(), taskNo, questions);
+        saveTaskCompetitors(task.getId(), taskNo, competitors);
 
-        List<TaskResult> results = createTaskResults(task.getId(), taskNo, aiPlatforms, savedQuestions);
+        List<TaskResult> results = createTaskResults(task.getId(), taskNo, aiPlatforms, savedQuestions, brandName);
         for (TaskResult result : results) {
             taskResultMapper.insert(result);
         }
@@ -78,9 +87,18 @@ public class TaskService {
         task.setStatus(TaskStatus.PROCESSING.name());
         taskMapper.updateById(task);
 
-        rpaDispatchService.dispatchTasks(taskNo, results);
+        rpaDispatchService.dispatchTasks(taskNo, results, brandName, competitors, executionFrequency, retryOnFailure);
 
         return task;
+    }
+
+    private void validateBrandName(String brandName) {
+        if (brandName == null || brandName.trim().isEmpty()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "自主品牌名不能为空");
+        }
+        if (brandName.length() > 100) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "自主品牌名长度不能超过100字符");
+        }
     }
 
     private void validateAiPlatforms(List<String> aiPlatforms) {
@@ -144,9 +162,26 @@ public class TaskService {
         return taskQuestions;
     }
 
+    private void saveTaskCompetitors(Long taskId, String taskNo, List<String> competitors) {
+        if (competitors == null || competitors.isEmpty()) {
+            return;
+        }
+        for (String competitor : competitors) {
+            if (competitor != null && !competitor.trim().isEmpty()) {
+                TaskQuestion tq = new TaskQuestion();
+                tq.setTaskId(taskId);
+                tq.setTaskNo(taskNo);
+                tq.setQuestionText("竞争对手: " + competitor.trim());
+                tq.setSortOrder(999);
+                taskQuestionMapper.insert(tq);
+            }
+        }
+    }
+
     private List<TaskResult> createTaskResults(Long taskId, String taskNo,
                                                 List<String> aiPlatforms,
-                                                List<TaskQuestion> questions) {
+                                                List<TaskQuestion> questions,
+                                                String brandName) {
         List<TaskResult> results = new ArrayList<>();
         for (TaskQuestion question : questions) {
             for (String platform : aiPlatforms) {
@@ -169,6 +204,13 @@ public class TaskService {
                 new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
         wrapper.eq("task_no", taskNo);
         return taskMapper.selectOne(wrapper);
+    }
+
+    public List<Task> listTasks() {
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Task> wrapper = 
+                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        wrapper.orderByDesc("created_at");
+        return taskMapper.selectList(wrapper);
     }
 
     public TaskProgressVO getTaskProgress(String taskNo) {
@@ -214,7 +256,7 @@ public class TaskService {
                     .aiDisplayName(platformNameMap.getOrDefault(r.getAiPlatform(), r.getAiPlatform()))
                     .questionText(r.getQuestionText())
                     .answerText(r.getAnswerText())
-                    .screenshotUrl(r.getScreenshotUrl())
+                    .screenshotUrls(parseScreenshotUrls(r.getScreenshotUrls()))
                     .status(r.getStatus())
                     .errorMsg(r.getErrorMsg())
                     .durationMs(r.getDurationMs())
@@ -227,6 +269,18 @@ public class TaskService {
         return voList;
     }
 
+    private java.util.List<String> parseScreenshotUrls(String screenshotUrlsJson) {
+        if (screenshotUrlsJson == null || screenshotUrlsJson.isEmpty()) {
+            return new java.util.ArrayList<>();
+        }
+        try {
+            return objectMapper.readValue(screenshotUrlsJson, new TypeReference<List<String>>() {});
+        } catch (JsonProcessingException e) {
+            log.warn("解析截图URLs失败: {}", screenshotUrlsJson, e);
+            return new java.util.ArrayList<>();
+        }
+    }
+
     @Transactional
     public void updateTaskResult(Long taskResultId, String answerText, String screenshotUrl,
                                  String status, String errorMsg, Long durationMs) {
@@ -236,7 +290,41 @@ public class TaskService {
         }
 
         result.setAnswerText(answerText);
-        result.setScreenshotUrl(screenshotUrl);
+        if (screenshotUrl != null && !screenshotUrl.isEmpty()) {
+            List<String> urls = new ArrayList<>();
+            urls.add(screenshotUrl);
+            try {
+                result.setScreenshotUrls(objectMapper.writeValueAsString(urls));
+            } catch (JsonProcessingException e) {
+                log.error("序列化截图URL失败", e);
+            }
+        }
+        result.setStatus(status);
+        result.setErrorMsg(errorMsg);
+        result.setDurationMs(durationMs);
+        result.setCompletedAt(LocalDateTime.now());
+        taskResultMapper.updateById(result);
+
+        updateTaskProgress(result.getTaskId());
+    }
+
+    @Transactional
+    public void updateTaskResultWithMultipleScreenshots(Long taskResultId, String answerText, 
+                                                        java.util.List<String> screenshotUrls,
+                                                        String status, String errorMsg, Long durationMs) {
+        TaskResult result = taskResultMapper.selectById(taskResultId);
+        if (result == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "任务结果不存在");
+        }
+
+        result.setAnswerText(answerText);
+        if (screenshotUrls != null && !screenshotUrls.isEmpty()) {
+            try {
+                result.setScreenshotUrls(objectMapper.writeValueAsString(screenshotUrls));
+            } catch (JsonProcessingException e) {
+                log.error("序列化截图URLs失败", e);
+            }
+        }
         result.setStatus(status);
         result.setErrorMsg(errorMsg);
         result.setDurationMs(durationMs);

@@ -15,7 +15,7 @@ public class TaskResult {
     private String aiPlatform;
     private String questionText;
     private String answerText;
-    private String screenshotUrl;
+    private String screenshotUrls;
     private String status;
     private String errorMsg;
     private Long durationMs;
@@ -41,8 +41,8 @@ public class TaskResult {
     public void setQuestionText(String questionText) { this.questionText = questionText; }
     public String getAnswerText() { return answerText; }
     public void setAnswerText(String answerText) { this.answerText = answerText; }
-    public String getScreenshotUrl() { return screenshotUrl; }
-    public void setScreenshotUrl(String screenshotUrl) { this.screenshotUrl = screenshotUrl; }
+    public String getScreenshotUrls() { return screenshotUrls; }
+    public void setScreenshotUrls(String screenshotUrls) { this.screenshotUrls = screenshotUrls; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getErrorMsg() { return errorMsg; }

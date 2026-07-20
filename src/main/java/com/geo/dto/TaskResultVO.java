@@ -11,7 +11,7 @@ public class TaskResultVO {
     private String aiDisplayName;
     private String questionText;
     private String answerText;
-    private String screenshotUrl;
+    private java.util.List<String> screenshotUrls;
     private String status;
     private String errorMsg;
     private Long durationMs;
@@ -29,8 +29,8 @@ public class TaskResultVO {
     public void setQuestionText(String questionText) { this.questionText = questionText; }
     public String getAnswerText() { return answerText; }
     public void setAnswerText(String answerText) { this.answerText = answerText; }
-    public String getScreenshotUrl() { return screenshotUrl; }
-    public void setScreenshotUrl(String screenshotUrl) { this.screenshotUrl = screenshotUrl; }
+    public java.util.List<String> getScreenshotUrls() { return screenshotUrls; }
+    public void setScreenshotUrls(java.util.List<String> screenshotUrls) { this.screenshotUrls = screenshotUrls; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getErrorMsg() { return errorMsg; }
@@ -55,7 +55,7 @@ public class TaskResultVO {
         public Builder aiDisplayName(String aiDisplayName) { vo.setAiDisplayName(aiDisplayName); return this; }
         public Builder questionText(String questionText) { vo.setQuestionText(questionText); return this; }
         public Builder answerText(String answerText) { vo.setAnswerText(answerText); return this; }
-        public Builder screenshotUrl(String screenshotUrl) { vo.setScreenshotUrl(screenshotUrl); return this; }
+        public Builder screenshotUrls(java.util.List<String> screenshotUrls) { vo.setScreenshotUrls(screenshotUrls); return this; }
         public Builder status(String status) { vo.setStatus(status); return this; }
         public Builder errorMsg(String errorMsg) { vo.setErrorMsg(errorMsg); return this; }
         public Builder durationMs(Long durationMs) { vo.setDurationMs(durationMs); return this; }

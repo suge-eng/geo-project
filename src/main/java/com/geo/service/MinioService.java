@@ -8,6 +8,7 @@ import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import io.minio.SetBucketPolicyArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,8 +42,23 @@ public class MinioService {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(minioConfig.getBucket()).build());
                 log.info("创建 MinIO Bucket: {}", minioConfig.getBucket());
             }
+            // 设置bucket为公开访问（只读）
+            setBucketPublicPolicy();
         } catch (Exception e) {
             log.error("创建 Bucket 失败", e);
+        }
+    }
+
+    private void setBucketPublicPolicy() {
+        try {
+            String policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetBucketLocation\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::" + minioConfig.getBucket() + "\"]},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::" + minioConfig.getBucket() + "/*\"]}]}";
+            minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
+                    .bucket(minioConfig.getBucket())
+                    .config(policy)
+                    .build());
+            log.info("已设置 Bucket {} 为公开只读访问", minioConfig.getBucket());
+        } catch (Exception e) {
+            log.error("设置 Bucket 策略失败", e);
         }
     }
 
@@ -55,23 +71,8 @@ public class MinioService {
                     .stream(is, file.getSize(), -1)
                     .contentType(file.getContentType())
                     .build());
+            log.info("文件上传成功, filename={}, publicUrl={}", filename, buildPublicUrl(filename));
             return buildPublicUrl(filename);
-        } catch (Exception e) {
-            log.error("上传文件失败", e);
-            throw new BusinessException(ResultCode.INTERNAL_ERROR, "文件上传失败");
-        }
-    }
-
-    public String uploadBytes(byte[] data, String filename, String contentType) {
-        String storedFilename = generateFilename(filename);
-        try (InputStream is = new ByteArrayInputStream(data)) {
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(minioConfig.getBucket())
-                    .object(storedFilename)
-                    .stream(is, data.length, -1)
-                    .contentType(contentType)
-                    .build());
-            return buildPublicUrl(storedFilename);
         } catch (Exception e) {
             log.error("上传文件失败", e);
             throw new BusinessException(ResultCode.INTERNAL_ERROR, "文件上传失败");
@@ -105,17 +106,18 @@ public class MinioService {
         if (endpoint == null || endpoint.isEmpty()) {
             endpoint = minioConfig.getEndpoint();
         }
-        return endpoint + "/" + minioConfig.getBucket() + "/" + filename;
+        String url = endpoint + "/" + minioConfig.getBucket() + "/" + filename;
+        return url;
     }
 
     private String extractFilename(String url) {
         if (url == null || url.isEmpty()) {
             return "";
         }
-        String bucket = minioConfig.getBucket() + "/";
-        int index = url.indexOf(bucket);
-        if (index > 0) {
-            return url.substring(index + bucket.length());
+        String bucket = minioConfig.getBucket();
+        int idx = url.indexOf(bucket);
+        if (idx >= 0) {
+            return url.substring(idx + bucket.length() + 1);
         }
         return url;
     }

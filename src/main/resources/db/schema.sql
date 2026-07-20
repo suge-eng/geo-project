@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS task_result (
     ai_platform VARCHAR(32) NOT NULL COMMENT 'AI平台',
     question_text TEXT NOT NULL COMMENT '问题文本(冗余)',
     answer_text MEDIUMTEXT COMMENT 'AI回答文本',
-    screenshot_url VARCHAR(500) COMMENT '长截图OSS地址',
+    screenshot_urls VARCHAR(500) COMMENT '长截图OSS地址',
     status VARCHAR(16) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING, RUNNING, SUCCESS, FAILED, TIMEOUT',
     error_msg VARCHAR(500) COMMENT '失败原因',
     duration_ms BIGINT COMMENT '耗时(毫秒)',

@@ -29,13 +29,18 @@ public class RpaDispatchService {
     }
 
     @Async("rpaDispatchExecutor")
-    public void dispatchTasks(String taskNo, List<TaskResult> results) {
-        log.info("开始调度任务: taskNo={}, count={}", taskNo, results.size());
+    public void dispatchTasks(String taskNo, List<TaskResult> results, String brandName, 
+                              List<String> competitors, String executionFrequency, Boolean retryOnFailure) {
+        log.info("开始调度任务: taskNo={}, count={}, brandName={}", taskNo, results.size(), brandName);
 
         RpaBatchTaskMessage batchMessage = new RpaBatchTaskMessage();
         batchMessage.setTaskId(taskNo);
         batchMessage.setNeedScreenshot(true);
-        batchMessage.setOutputDir("D:/GEO_RPA/result/" + taskNo);
+        batchMessage.setOutputDir("D:/截图图片/" + taskNo);
+        batchMessage.setBrandName(brandName);
+        batchMessage.setCompetitors(competitors);
+        batchMessage.setExecutionFrequency(executionFrequency);
+        batchMessage.setRetryOnFailure(retryOnFailure != null && retryOnFailure);
 
         Map<String, String> platformCodeToName = new HashMap<>();
         for (AiPlatform platform : AiPlatform.values()) {
@@ -45,7 +50,8 @@ public class RpaDispatchService {
         List<String> agentList = new ArrayList<>();
         List<RpaBatchTaskMessage.Question> questionList = new ArrayList<>();
         Map<String, String> platformUsed = new HashMap<>();
-        Map<String, String> questionUsed = new HashMap<>();
+        Map<String, RpaBatchTaskMessage.Question> questionUsed = new HashMap<>();
+        Map<String, Map<String, String>> resultIdMap = new HashMap<>();  // platform -> questionKey -> taskResultId
         int qIndex = 1;
 
         for (TaskResult result : results) {
@@ -53,20 +59,25 @@ public class RpaDispatchService {
             if (!platformUsed.containsKey(result.getAiPlatform())) {
                 agentList.add(platformName);
                 platformUsed.put(result.getAiPlatform(), platformName);
+                resultIdMap.put(platformName, new HashMap<>());
             }
 
             String questionKey = result.getQuestionText();
             if (!questionUsed.containsKey(questionKey)) {
                 RpaBatchTaskMessage.Question question = new RpaBatchTaskMessage.Question();
-               // question.setQId("Q" + String.format("%03d", qIndex++));
+                question.setQId("Q" + String.format("%03d", qIndex++));
                 question.setContent(result.getQuestionText());
                 questionList.add(question);
-                questionUsed.put(questionKey, question.getQId());
+                questionUsed.put(questionKey, question);
             }
+
+            // 记录每个(平台,问题)对应的taskResultId
+            resultIdMap.get(platformName).put(questionKey, result.getId().toString());
         }
 
         batchMessage.setAgentList(agentList);
         batchMessage.setQuestionList(questionList);
+        batchMessage.setResultIdMap(resultIdMap);
 
         try {
             rabbitTemplate.convertAndSend(
@@ -99,8 +110,13 @@ public class RpaDispatchService {
         private String taskId;
         private List<String> agentList;
         private List<Question> questionList;
+        private Map<String, Map<String, String>> resultIdMap;  // platform -> questionKey -> taskResultId
         private boolean needScreenshot;
         private String outputDir;
+        private String brandName;
+        private List<String> competitors;
+        private String executionFrequency;
+        private boolean retryOnFailure;
 
         public String getTaskId() { return taskId; }
         public void setTaskId(String taskId) { this.taskId = taskId; }
@@ -108,10 +124,20 @@ public class RpaDispatchService {
         public void setAgentList(List<String> agentList) { this.agentList = agentList; }
         public List<Question> getQuestionList() { return questionList; }
         public void setQuestionList(List<Question> questionList) { this.questionList = questionList; }
+        public Map<String, Map<String, String>> getResultIdMap() { return resultIdMap; }
+        public void setResultIdMap(Map<String, Map<String, String>> resultIdMap) { this.resultIdMap = resultIdMap; }
         public boolean isNeedScreenshot() { return needScreenshot; }
         public void setNeedScreenshot(boolean needScreenshot) { this.needScreenshot = needScreenshot; }
         public String getOutputDir() { return outputDir; }
         public void setOutputDir(String outputDir) { this.outputDir = outputDir; }
+        public String getBrandName() { return brandName; }
+        public void setBrandName(String brandName) { this.brandName = brandName; }
+        public List<String> getCompetitors() { return competitors; }
+        public void setCompetitors(List<String> competitors) { this.competitors = competitors; }
+        public String getExecutionFrequency() { return executionFrequency; }
+        public void setExecutionFrequency(String executionFrequency) { this.executionFrequency = executionFrequency; }
+        public boolean isRetryOnFailure() { return retryOnFailure; }
+        public void setRetryOnFailure(boolean retryOnFailure) { this.retryOnFailure = retryOnFailure; }
 
         public static class Question {
             private String qId;

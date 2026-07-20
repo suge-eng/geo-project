@@ -25,14 +25,25 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    @GetMapping("/list")
+    public Result<List<Task>> listTasks() {
+        List<Task> tasks = taskService.listTasks();
+        return Result.success(tasks);
+    }
+
     @PostMapping("/submit")
     public Result<Task> submitTask(@Valid @RequestBody TaskSubmitRequest request) {
-        log.info("收到任务提交请求: aiPlatforms={}, questionCount={}",
-                request.getAiPlatforms(), request.getQuestions().size());
+        log.info("收到任务提交请求: aiPlatforms={}, questionCount={}, brandName={}",
+                request.getAiPlatforms(), request.getQuestions().size(), request.getBrandName());
+        
         Task task = taskService.createTask(
                 request.getAiPlatforms(),
                 request.getQuestions(),
-                request.getTitle()
+                request.getTitle(),
+                request.getBrandName(),
+                request.getCompetitors(),
+                request.getExecutionFrequency(),
+                request.getRetryOnFailure()
         );
         return Result.success("任务已提交", task);
     }
