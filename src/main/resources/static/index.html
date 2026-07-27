@@ -200,6 +200,30 @@
             color: #721c24;
         }
 
+        .status-partial-failed {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .btn-retry {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-retry:hover {
+            background: #c82333;
+        }
+
+        .btn-retry:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
         .task-meta {
             margin-top: 8px;
             font-size: 12px;
@@ -516,12 +540,20 @@
 
             <!-- 任务详情 -->
             <div v-if="selectedTask" class="card" style="margin-top: 20px;">
-                <div class="card-header" style="justify-content: space-between;">
+                <div class="card-header" style="justify-content: space-between; align-items: center;">
                     <div>
                         <h2 class="card-title">{{ selectedTask.title }}</h2>
                         <span style="font-size: 12px; color: #888;">任务号: {{ selectedTask.taskNo }}</span>
                     </div>
-                    <button @click="selectedTask = null" class="btn btn-secondary">关闭</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button v-if="canRetryTask" @click="retryFailedTasks" :disabled="isRetrying" class="btn btn-retry">
+                            {{ isRetrying ? '重试中...' : '重试失败任务' }}
+                        </button>
+                        <button v-if="selectedTask" @click="retryAllTasks" :disabled="isRetrying" class="btn btn-primary">
+                            {{ isRetrying ? '重试中...' : '重试所有任务' }}
+                        </button>
+                        <button @click="selectedTask = null" class="btn btn-secondary">关闭</button>
+                    </div>
                 </div>
 
                 <div class="progress-bar" style="margin-bottom: 20px;">
@@ -529,16 +561,30 @@
                 </div>
                 <div style="text-align: right; font-size: 14px; color: #666; margin-bottom: 20px;">
                     进度: {{ progress.percentage }}% ({{ progress.completed }}/{{ progress.total }})
+                    <span v-if="progress.failed > 0" style="color: #dc3545; margin-left: 10px;">失败: {{ progress.failed }}</span>
                 </div>
 
                 <div class="results-grid">
-                    <div v-for="result in taskResults" :key="result.id" class="result-card">
-                        <div class="result-platform">{{ result.aiDisplayName }}</div>
+                    <div v-for="result in taskResults" :key="result.id" class="result-card" :class="{ 'result-card-failed': result.status === 'FAILED' || result.status === 'TIMEOUT' }">
+                        <div class="result-platform">{{ result.aiDisplayName }}
+                            <span v-if="result.rpaRetryCount > 0" style="font-size: 11px; color: #666; margin-left: 8px;">(重试{{ result.rpaRetryCount }}次)</span>
+                        </div>
                         <div class="result-question">{{ result.questionText }}</div>
-                        <div v-if="result.answerText" class="result-answer">{{ result.answerText }}</div>
-                        <div v-if="result.errorMsg" class="result-error">{{ result.errorMsg }}</div>
+                        <div v-if="result.status === 'SUCCESS'" class="result-answer">{{ result.answerText }}
+                            <button @click="retrySingleResult(result.id)" :disabled="isRetrying" class="btn btn-retry" style="margin-top: 10px; padding: 6px 12px; font-size: 12px;">
+                                重试此任务
+                            </button>
+                        </div>
+                        <div v-if="result.status === 'FAILED' || result.status === 'TIMEOUT'" class="result-error">
+                            <div>{{ result.errorMsg || '任务失败' }}</div>
+                            <button @click="retrySingleResult(result.id)" :disabled="isRetrying" class="btn btn-retry" style="margin-top: 10px; padding: 6px 12px; font-size: 12px;">
+                                重试此任务
+                            </button>
+                        </div>
+                        <div v-if="result.status === 'PENDING'" style="color: #888; font-size: 13px;">等待处理...</div>
+                        <div v-if="result.status === 'RUNNING'" style="color: #007bff; font-size: 13px;">处理中...</div>
                         <div v-if="result.screenshotUrls && result.screenshotUrls.length > 0" class="result-screenshots">
-                            <img v-for="(url, index) in result.screenshotUrls" :key="index" :src="url" :alt="'截图' + (index + 1)" @click="openImageModal(url, index + 1)">
+                            <img v-for="(url, index) in result.screenshotUrls" :key="url + '-' + index" :src="url + '?t=' + new Date().getTime()" :alt="'截图' + (index + 1)" @click="openImageModal(url, index + 1)" @error="handleImageError($event)">
                         </div>
                     </div>
                 </div>
@@ -602,6 +648,7 @@
                     taskResults: [],
                     progress: { total: 0, completed: 0, percentage: 0 },
                     isSubmitting: false,
+                    isRetrying: false,
                     toast: { show: false, message: '', type: 'success' },
                     progressInterval: null,
                     resultInterval: null,
@@ -614,6 +661,11 @@
                            this.taskForm.aiPlatforms.length > 0 &&
                            this.taskForm.questionsText.trim() &&
                            this.taskForm.brandName.trim()
+                },
+                canRetryTask() {
+                    if (!this.selectedTask) return false
+                    const hasFailed = this.taskResults.some(r => r.status === 'FAILED' || r.status === 'TIMEOUT')
+                    return hasFailed && this.selectedTask.status !== 'PROCESSING'
                 }
             },
             mounted() {
@@ -677,7 +729,7 @@
                     if (this.progressInterval) clearInterval(this.progressInterval)
                     if (this.resultInterval) clearInterval(this.resultInterval)
 
-                    if (task.status === 'RUNNING' || task.status === 'PENDING') {
+                    if (task.status === 'RUNNING' || task.status === 'PENDING' || task.status === 'PROCESSING') {
                         this.progressInterval = setInterval(() => this.loadProgress(), 2000)
                         this.resultInterval = setInterval(() => this.loadResults(), 3000)
                     }
@@ -691,6 +743,7 @@
                         this.progress = {
                             total: data.totalCount || 0,
                             completed: data.completedCount || 0,
+                            failed: data.failedCount || 0,
                             percentage: data.percentage || 0
                         }
                     } catch (error) {
@@ -711,9 +764,11 @@
                 getStatusClass(status) {
                     const classes = {
                         'PENDING': 'status-pending',
+                        'PROCESSING': 'status-processing',
                         'RUNNING': 'status-running',
                         'COMPLETED': 'status-completed',
-                        'FAILED': 'status-failed'
+                        'FAILED': 'status-failed',
+                        'PARTIAL_FAILED': 'status-partial-failed'
                     }
                     return classes[status] || 'status-pending'
                 },
@@ -721,11 +776,85 @@
                 getStatusText(status) {
                     const texts = {
                         'PENDING': '待处理',
+                        'PROCESSING': '处理中',
                         'RUNNING': '运行中',
                         'COMPLETED': '已完成',
-                        'FAILED': '失败'
+                        'FAILED': '失败',
+                        'PARTIAL_FAILED': '部分失败'
                     }
                     return texts[status] || status
+                },
+
+                async retryFailedTasks() {
+                    if (!this.selectedTask) return
+                    this.isRetrying = true
+                    try {
+                        await axios.post(`/api/task/${this.selectedTask.taskNo}/retry`)
+                        this.showToast('失败任务已重新调度', 'success')
+                        this.selectedTask.status = 'PROCESSING'
+                        this.taskResults.forEach(r => {
+                            if (r.status === 'FAILED' || r.status === 'TIMEOUT') {
+                                r.status = 'PENDING'
+                                r.errorMsg = null
+                            }
+                        })
+                        if (this.progressInterval) clearInterval(this.progressInterval)
+                        if (this.resultInterval) clearInterval(this.resultInterval)
+                        this.progressInterval = setInterval(() => this.loadProgress(), 2000)
+                        this.resultInterval = setInterval(() => this.loadResults(), 3000)
+                    } catch (error) {
+                        this.showToast(error.response?.data?.message || '重试失败', 'error')
+                    } finally {
+                        this.isRetrying = false
+                    }
+                },
+
+                async retryAllTasks() {
+                    if (!this.selectedTask) return
+                    this.isRetrying = true
+                    try {
+                        await axios.post(`/api/task/${this.selectedTask.taskNo}/retry/all`)
+                        this.showToast('所有任务已重新调度', 'success')
+                        this.selectedTask.status = 'PROCESSING'
+                        this.taskResults.forEach(r => {
+                            r.status = 'PENDING'
+                            r.errorMsg = null
+                            r.answerText = null
+                            r.screenshotUrls = []
+                        })
+                        if (this.progressInterval) clearInterval(this.progressInterval)
+                        if (this.resultInterval) clearInterval(this.resultInterval)
+                        this.progressInterval = setInterval(() => this.loadProgress(), 2000)
+                        this.resultInterval = setInterval(() => this.loadResults(), 3000)
+                    } catch (error) {
+                        this.showToast(error.response?.data?.message || '重试失败', 'error')
+                    } finally {
+                        this.isRetrying = false
+                    }
+                },
+
+                async retrySingleResult(taskResultId) {
+                    this.isRetrying = true
+                    try {
+                        await axios.post(`/api/task/result/${taskResultId}/retry`)
+                        this.showToast('任务已重新调度', 'success')
+                        const result = this.taskResults.find(r => r.id === taskResultId)
+                        if (result) {
+                            result.status = 'PENDING'
+                            result.errorMsg = null
+                        }
+                        if (this.selectedTask.status !== 'PROCESSING') {
+                            this.selectedTask.status = 'PROCESSING'
+                        }
+                        if (this.progressInterval) clearInterval(this.progressInterval)
+                        if (this.resultInterval) clearInterval(this.resultInterval)
+                        this.progressInterval = setInterval(() => this.loadProgress(), 2000)
+                        this.resultInterval = setInterval(() => this.loadResults(), 3000)
+                    } catch (error) {
+                        this.showToast(error.response?.data?.message || '重试失败', 'error')
+                    } finally {
+                        this.isRetrying = false
+                    }
                 },
 
                 showToast(message, type) {
@@ -741,6 +870,10 @@
 
                 closeImageModal() {
                     this.imageModal.show = false
+                },
+
+                handleImageError(event) {
+                    event.target.style.display = 'none'
                 }
             }
         }).mount('#app')

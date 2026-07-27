@@ -17,4 +17,6 @@ public interface TaskResultMapper extends BaseMapper<TaskResult> {
 
     @Update("UPDATE task_result SET status = #{status} WHERE task_id = #{taskId}")
     int updateStatusByTaskId(@Param("taskId") Long taskId, @Param("status") String status);
+
+    List<TaskResult> selectByStatus(@Param("status") String status);
 }

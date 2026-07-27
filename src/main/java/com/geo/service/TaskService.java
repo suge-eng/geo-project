@@ -72,6 +72,12 @@ public class TaskService {
         task.setTotalCount(aiPlatforms.size() * questions.size());
         task.setCompletedCount(0);
         task.setFailedCount(0);
+        task.setBrandName(brandName);
+        try {
+            task.setCompetitors(objectMapper.writeValueAsString(competitors));
+        } catch (JsonProcessingException e) {
+            log.warn("序列化竞争对手列表失败", e);
+        }
         
         taskMapper.insert(task);
 
@@ -116,7 +122,7 @@ public class TaskService {
         if (questions == null || questions.isEmpty()) {
             throw new BusinessException(ResultCode.QUESTION_EMPTY);
         }
-        if (questions.size() > 50) {
+        if (questions.size() > 1000) {
             throw new BusinessException(ResultCode.QUESTION_TOO_MANY);
         }
         for (String question : questions) {
@@ -371,5 +377,171 @@ public class TaskService {
         }
 
         taskMapper.updateById(task);
+    }
+
+    @Transactional
+    public Task retryFailedTasks(String taskNo) {
+        return retryTasks(taskNo, null);
+    }
+
+    @Transactional
+    public Task retryAllTasks(String taskNo) {
+        return retryTasks(taskNo, "all");
+    }
+
+    @Transactional
+    public Task retryTasks(String taskNo, String filter) {
+        Task task = getTaskByNo(taskNo);
+        if (task == null) {
+            throw new BusinessException(ResultCode.TASK_NOT_FOUND);
+        }
+
+        List<TaskResult> results = taskResultMapper.selectByTaskNo(taskNo);
+        List<TaskResult> retryResults = new ArrayList<>();
+        
+        for (TaskResult result : results) {
+            String status = result.getStatus();
+            // 根据过滤条件决定是否重试
+            boolean shouldRetry = false;
+            if ("all".equals(filter)) {
+                // 重试所有任务（包括成功的）
+                shouldRetry = true;
+            } else if (ResultStatus.FAILED.name().equals(status) || ResultStatus.TIMEOUT.name().equals(status)) {
+                // 默认只重试失败的任务
+                shouldRetry = true;
+            }
+            
+            if (shouldRetry) {
+                result.setStatus(ResultStatus.PENDING.name());
+                result.setErrorMsg(null);
+                result.setAnswerText(null);
+                result.setScreenshotUrls(null);
+                result.setDurationMs(null);
+                result.setCompletedAt(null);
+                result.setCreatedAt(LocalDateTime.now());
+                result.setRpaRetryCount(result.getRpaRetryCount() != null ? result.getRpaRetryCount() + 1 : 1);
+                taskResultMapper.updateById(result);
+                retryResults.add(result);
+            }
+        }
+
+        if (retryResults.isEmpty()) {
+            if ("all".equals(filter)) {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "没有任务需要重试");
+            } else {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "没有失败的任务需要重试");
+            }
+        }
+
+        task.setStatus(TaskStatus.PROCESSING.name());
+        task.setCompletedAt(null);
+        taskMapper.updateById(task);
+
+        List<String> competitorsList = new ArrayList<>();
+        if (task.getCompetitors() != null && !task.getCompetitors().isEmpty()) {
+            try {
+                competitorsList = objectMapper.readValue(task.getCompetitors(), new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                log.warn("解析竞争对手列表失败", e);
+            }
+        }
+        rpaDispatchService.dispatchTasks(taskNo, retryResults, task.getBrandName(), competitorsList, "single", true);
+
+        log.info("重试任务: taskNo={}, retryCount={}, filter={}", taskNo, retryResults.size(), filter);
+        return task;
+    }
+
+    @Transactional
+    public Task retrySpecificTaskResult(Long taskResultId) {
+        TaskResult result = taskResultMapper.selectById(taskResultId);
+        if (result == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "任务结果不存在");
+        }
+
+        result.setStatus(ResultStatus.PENDING.name());
+        result.setErrorMsg(null);
+        result.setAnswerText(null);
+        result.setScreenshotUrls(null);
+        result.setDurationMs(null);
+        result.setCompletedAt(null);
+        result.setCreatedAt(LocalDateTime.now());
+        result.setRpaRetryCount(result.getRpaRetryCount() != null ? result.getRpaRetryCount() + 1 : 1);
+        taskResultMapper.updateById(result);
+
+        Task task = taskMapper.selectById(result.getTaskId());
+        if (task != null && !TaskStatus.PROCESSING.name().equals(task.getStatus())) {
+            task.setStatus(TaskStatus.PROCESSING.name());
+            task.setCompletedAt(null);
+            taskMapper.updateById(task);
+        }
+
+        List<TaskResult> retryResults = new ArrayList<>();
+        retryResults.add(result);
+        
+        List<String> competitorsList = new ArrayList<>();
+        if (task != null && task.getCompetitors() != null && !task.getCompetitors().isEmpty()) {
+            try {
+                competitorsList = objectMapper.readValue(task.getCompetitors(), new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                log.warn("解析竞争对手列表失败", e);
+            }
+        }
+        rpaDispatchService.dispatchTasks(result.getTaskNo(), retryResults, task != null ? task.getBrandName() : "", competitorsList, "single", true);
+
+        log.info("重试单个任务: taskResultId={}, taskNo={}", taskResultId, result.getTaskNo());
+        return task;
+    }
+
+    @Transactional
+    public Task retrySuccessTasks(String taskNo) {
+        return retryTasks(taskNo, "success");
+    }
+
+    @Transactional
+    public Task retryTasksByStatus(String taskNo, String status) {
+        Task task = getTaskByNo(taskNo);
+        if (task == null) {
+            throw new BusinessException(ResultCode.TASK_NOT_FOUND);
+        }
+
+        List<TaskResult> results = taskResultMapper.selectByTaskNo(taskNo);
+        List<TaskResult> retryResults = new ArrayList<>();
+        
+        for (TaskResult result : results) {
+            String resultStatus = result.getStatus();
+            if (status.equalsIgnoreCase(resultStatus)) {
+                result.setStatus(ResultStatus.PENDING.name());
+                result.setErrorMsg(null);
+                result.setAnswerText(null);
+                result.setScreenshotUrls(null);
+                result.setDurationMs(null);
+                result.setCompletedAt(null);
+                result.setCreatedAt(LocalDateTime.now());
+                result.setRpaRetryCount(result.getRpaRetryCount() != null ? result.getRpaRetryCount() + 1 : 1);
+                taskResultMapper.updateById(result);
+                retryResults.add(result);
+            }
+        }
+
+        if (retryResults.isEmpty()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "没有" + status + "状态的任务需要重试");
+        }
+
+        task.setStatus(TaskStatus.PROCESSING.name());
+        task.setCompletedAt(null);
+        taskMapper.updateById(task);
+
+        List<String> competitorsList = new ArrayList<>();
+        if (task.getCompetitors() != null && !task.getCompetitors().isEmpty()) {
+            try {
+                competitorsList = objectMapper.readValue(task.getCompetitors(), new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                log.warn("解析竞争对手列表失败", e);
+            }
+        }
+        rpaDispatchService.dispatchTasks(taskNo, retryResults, task.getBrandName(), competitorsList, "single", true);
+
+        log.info("按状态重试任务: taskNo={}, retryCount={}, status={}", taskNo, retryResults.size(), status);
+        return task;
     }
 }

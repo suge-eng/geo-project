@@ -43,7 +43,7 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
     db-config:
       id-type: auto
@@ -59,7 +59,8 @@ minio:
 
 logging:
   level:
-    com.geo: DEBUG
+    com.geo: INFO
+    com.geo.service.TaskTimeoutService: ERROR
     org.springframework.amqp: INFO
 
 geo:
@@ -68,3 +69,7 @@ geo:
     request-timeout-ms: 120000
     rate-limit:
       max-requests-per-minute: 60
+  task:
+    timeout:
+      check-interval-seconds: 60
+      timeout-minutes: 30

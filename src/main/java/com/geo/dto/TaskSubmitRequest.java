@@ -12,7 +12,7 @@ public class TaskSubmitRequest {
     private List<String> aiPlatforms;
 
     @NotEmpty(message = "问题列表不能为空")
-    @Size(max = 50, message = "问题数量不能超过50个")
+    @Size(max = 1000, message = "问题数量不能超过1000个")
     private List<String> questions;
 
     @NotEmpty(message = "项目名称不能为空")

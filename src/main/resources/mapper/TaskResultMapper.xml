@@ -10,4 +10,8 @@
         SELECT * FROM task_result WHERE task_id = #{taskId} ORDER BY id
     </select>
     
+    <select id="selectByStatus" resultType="com.geo.entity.TaskResult">
+        SELECT * FROM task_result WHERE status = #{status}
+    </select>
+    
 </mapper>

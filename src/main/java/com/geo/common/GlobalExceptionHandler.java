@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -59,6 +60,16 @@ public class GlobalExceptionHandler {
     public Result<Void> handleAsyncTimeout(AsyncRequestTimeoutException e) {
         log.warn("异步请求超时");
         return Result.fail(ResultCode.RATE_LIMIT_EXCEEDED, "系统繁忙，请稍后再试");
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Result<Void> handleNoResourceFound(NoResourceFoundException e) {
+        if (e.getMessage() != null && e.getMessage().contains("favicon.ico")) {
+            return null;
+        }
+        log.warn("资源未找到: {}", e.getMessage());
+        return Result.fail(ResultCode.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)

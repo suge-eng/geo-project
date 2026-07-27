@@ -18,6 +18,8 @@ public class Task {
     private Integer failedCount;
     private Integer totalAiCount;
     private Integer totalQuestionCount;
+    private String brandName;
+    private String competitors;
     private String errorMsg;
 
     @TableField(fill = FieldFill.INSERT)
@@ -48,6 +50,10 @@ public class Task {
     public void setTotalAiCount(Integer totalAiCount) { this.totalAiCount = totalAiCount; }
     public Integer getTotalQuestionCount() { return totalQuestionCount; }
     public void setTotalQuestionCount(Integer totalQuestionCount) { this.totalQuestionCount = totalQuestionCount; }
+    public String getBrandName() { return brandName; }
+    public void setBrandName(String brandName) { this.brandName = brandName; }
+    public String getCompetitors() { return competitors; }
+    public void setCompetitors(String competitors) { this.competitors = competitors; }
     public String getErrorMsg() { return errorMsg; }
     public void setErrorMsg(String errorMsg) { this.errorMsg = errorMsg; }
     public LocalDateTime getCreatedAt() { return createdAt; }
