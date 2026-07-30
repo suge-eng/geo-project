@@ -19,4 +19,6 @@ public interface TaskResultMapper extends BaseMapper<TaskResult> {
     int updateStatusByTaskId(@Param("taskId") Long taskId, @Param("status") String status);
 
     List<TaskResult> selectByStatus(@Param("status") String status);
+
+    void deleteByTaskNo(@Param("taskNo") String taskNo);
 }

@@ -11,4 +11,6 @@ import java.util.List;
 public interface TaskAiMapper extends BaseMapper<TaskAi> {
 
     List<TaskAi> selectByTaskNo(@Param("taskNo") String taskNo);
+
+    void deleteByTaskNo(@Param("taskNo") String taskNo);
 }

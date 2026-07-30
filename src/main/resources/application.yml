@@ -6,7 +6,7 @@ spring:
     name: geo-backend
 
   datasource:
-    url: jdbc:mysql://localhost:3306/geo_backend?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3307/geo_backend?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: geo
     password: geo123
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -14,13 +14,13 @@ spring:
   data:
     redis:
       host: localhost
-      port: 6379
+      port: 6380
       password: redis123
       timeout: 10s
 
   rabbitmq:
     host: localhost
-    port: 5672
+    port: 5673
     username: geo
     password: geo123
     virtual-host: /
@@ -43,7 +43,7 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: auto
@@ -51,16 +51,15 @@ mybatis-plus:
   mapper-locations: classpath*:mapper/**/*.xml
 
 minio:
-  endpoint: http://localhost:9000
+  endpoint: http://localhost:9002
   access-key: minioadmin
   secret-key: minioadmin123
   bucket: geo-bucket
-  public-endpoint: http://localhost:9000
+  public-endpoint: http://localhost:9002
 
 logging:
   level:
-    com.geo: INFO
-    com.geo.service.TaskTimeoutService: ERROR
+    com.geo: DEBUG
     org.springframework.amqp: INFO
 
 geo:
@@ -69,7 +68,3 @@ geo:
     request-timeout-ms: 120000
     rate-limit:
       max-requests-per-minute: 60
-  task:
-    timeout:
-      check-interval-seconds: 60
-      timeout-minutes: 30

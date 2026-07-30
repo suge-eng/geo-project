@@ -11,6 +11,8 @@ public class TaskResultVO {
     private String aiDisplayName;
     private String questionText;
     private String answerText;
+    private String thinkingContent;
+    private String sourceInfo;
     private java.util.List<String> screenshotUrls;
     private String status;
     private String errorMsg;
@@ -29,6 +31,10 @@ public class TaskResultVO {
     public void setQuestionText(String questionText) { this.questionText = questionText; }
     public String getAnswerText() { return answerText; }
     public void setAnswerText(String answerText) { this.answerText = answerText; }
+    public String getThinkingContent() { return thinkingContent; }
+    public void setThinkingContent(String thinkingContent) { this.thinkingContent = thinkingContent; }
+    public String getSourceInfo() { return sourceInfo; }
+    public void setSourceInfo(String sourceInfo) { this.sourceInfo = sourceInfo; }
     public java.util.List<String> getScreenshotUrls() { return screenshotUrls; }
     public void setScreenshotUrls(java.util.List<String> screenshotUrls) { this.screenshotUrls = screenshotUrls; }
     public String getStatus() { return status; }
@@ -55,6 +61,8 @@ public class TaskResultVO {
         public Builder aiDisplayName(String aiDisplayName) { vo.setAiDisplayName(aiDisplayName); return this; }
         public Builder questionText(String questionText) { vo.setQuestionText(questionText); return this; }
         public Builder answerText(String answerText) { vo.setAnswerText(answerText); return this; }
+        public Builder thinkingContent(String thinkingContent) { vo.setThinkingContent(thinkingContent); return this; }
+        public Builder sourceInfo(String sourceInfo) { vo.setSourceInfo(sourceInfo); return this; }
         public Builder screenshotUrls(java.util.List<String> screenshotUrls) { vo.setScreenshotUrls(screenshotUrls); return this; }
         public Builder status(String status) { vo.setStatus(status); return this; }
         public Builder errorMsg(String errorMsg) { vo.setErrorMsg(errorMsg); return this; }

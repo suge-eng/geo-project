@@ -12,7 +12,7 @@ services:
       MYSQL_PASSWORD: geo123
       TZ: Asia/Shanghai
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./docker-data/mysql:/var/lib/mysql
       - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
@@ -31,7 +31,7 @@ services:
     container_name: geo_redis
     restart: always
     ports:
-      - "6379:6379"
+      - "6380:6379"
     command: redis-server --requirepass redis123 --appendonly yes
     volumes:
       - ./docker-data/redis:/data
@@ -49,8 +49,8 @@ services:
       RABBITMQ_DEFAULT_USER: geo
       RABBITMQ_DEFAULT_PASS: geo123
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5673:5672"
+      - "15673:15672"
     volumes:
       - ./docker-data/rabbitmq:/var/lib/rabbitmq
     healthcheck:
@@ -67,8 +67,8 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin123
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9002:9000"
+      - "9003:9001"
     volumes:
       - ./docker-data/minio:/data
     command: server /data --console-address ":9001"

@@ -18,8 +18,14 @@ public class Task {
     private Integer failedCount;
     private Integer totalAiCount;
     private Integer totalQuestionCount;
+    @TableField(exist = false)
     private String brandName;
+    @TableField(exist = false)
     private String competitors;
+    @TableField(exist = false)
+    private String executionFrequency;
+    @TableField(exist = false)
+    private Boolean retryOnFailure;
     private String errorMsg;
 
     @TableField(fill = FieldFill.INSERT)
@@ -54,6 +60,10 @@ public class Task {
     public void setBrandName(String brandName) { this.brandName = brandName; }
     public String getCompetitors() { return competitors; }
     public void setCompetitors(String competitors) { this.competitors = competitors; }
+    public String getExecutionFrequency() { return executionFrequency; }
+    public void setExecutionFrequency(String executionFrequency) { this.executionFrequency = executionFrequency; }
+    public Boolean getRetryOnFailure() { return retryOnFailure; }
+    public void setRetryOnFailure(Boolean retryOnFailure) { this.retryOnFailure = retryOnFailure; }
     public String getErrorMsg() { return errorMsg; }
     public void setErrorMsg(String errorMsg) { this.errorMsg = errorMsg; }
     public LocalDateTime getCreatedAt() { return createdAt; }

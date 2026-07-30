@@ -90,12 +90,59 @@ public class TaskService {
             taskResultMapper.insert(result);
         }
 
+        return task;
+    }
+
+    @Transactional
+    public Task submitTask(String taskNo, String executionFrequency, Boolean retryOnFailure) {
+        Task task = getTaskByNo(taskNo);
+        if (task == null) {
+            throw new BusinessException(ResultCode.TASK_NOT_FOUND);
+        }
+        
+        if (!TaskStatus.PENDING.name().equals(task.getStatus())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "任务状态不允许提交");
+        }
+
         task.setStatus(TaskStatus.PROCESSING.name());
         taskMapper.updateById(task);
 
-        rpaDispatchService.dispatchTasks(taskNo, results, brandName, competitors, executionFrequency, retryOnFailure);
+        List<TaskResult> results = taskResultMapper.selectByTaskNo(taskNo);
+        
+        List<String> competitorsList = new ArrayList<>();
+        if (task.getCompetitors() != null && !task.getCompetitors().isEmpty()) {
+            try {
+                competitorsList = objectMapper.readValue(task.getCompetitors(), new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                log.warn("解析竞争对手列表失败", e);
+            }
+        }
+        
+        rpaDispatchService.dispatchTasks(taskNo, results, task.getBrandName(), competitorsList, 
+                executionFrequency, retryOnFailure);
 
+        log.info("提交任务: taskNo={}", taskNo);
         return task;
+    }
+
+    @Transactional
+    public void deleteTask(String taskNo) {
+        Task task = getTaskByNo(taskNo);
+        if (task == null) {
+            throw new BusinessException(ResultCode.TASK_NOT_FOUND);
+        }
+        
+        String status = task.getStatus();
+        if (TaskStatus.PROCESSING.name().equals(status)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "任务正在运行中，无法删除");
+        }
+
+        taskResultMapper.deleteByTaskNo(taskNo);
+        taskQuestionMapper.deleteByTaskNo(taskNo);
+        taskAiMapper.deleteByTaskNo(taskNo);
+        taskMapper.deleteById(task.getId());
+
+        log.info("删除任务: taskNo={}", taskNo);
     }
 
     private void validateBrandName(String brandName) {
@@ -262,6 +309,8 @@ public class TaskService {
                     .aiDisplayName(platformNameMap.getOrDefault(r.getAiPlatform(), r.getAiPlatform()))
                     .questionText(r.getQuestionText())
                     .answerText(r.getAnswerText())
+                    .thinkingContent(r.getThinkingContent())
+                    .sourceInfo(r.getSourceInfo())
                     .screenshotUrls(parseScreenshotUrls(r.getScreenshotUrls()))
                     .status(r.getStatus())
                     .errorMsg(r.getErrorMsg())

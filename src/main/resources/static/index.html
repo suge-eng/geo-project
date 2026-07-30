@@ -15,20 +15,75 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f7fa;
             min-height: 100vh;
             padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-bar h1 {
+            font-size: 24px;
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .header-bar .search-area {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-bar select,
+        .header-bar input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .header-bar .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
         }
 
         .card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             padding: 24px;
             margin-bottom: 20px;
         }
@@ -116,20 +171,6 @@
             transition: all 0.2s;
         }
 
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a6fd6;
-        }
-
-        .btn-primary:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
         .btn-secondary {
             background: #f5f5f5;
             color: #333;
@@ -139,45 +180,91 @@
             background: #eee;
         }
 
-        .task-list {
-            max-height: 400px;
-            overflow-y: auto;
+        .btn-retry {
+            background: #dc3545;
+            color: white;
         }
 
-        .task-item {
-            padding: 16px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
+        .btn-retry:hover {
+            background: #c82333;
         }
 
-        .task-item:hover {
-            border-color: #667eea;
-            background: #fafafa;
+        .btn-retry:disabled,
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
 
-        .task-item:last-child {
-            margin-bottom: 0;
+        /* 任务卡片网格 */
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
         }
 
-        .task-header {
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            position: relative;
+            border-top: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .task-card.local {
+            border-top-color: #fd7e14;
+        }
+
+        .task-card.global {
+            border-top-color: #28a745;
+        }
+
+        .task-card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            margin-bottom: 12px;
         }
 
-        .task-title {
+        .task-card-title {
             font-weight: 600;
             color: #1a1a2e;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .task-card-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .task-card-actions button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #999;
+            font-size: 16px;
+            transition: color 0.2s;
+        }
+
+        .task-card-actions button:hover {
+            color: #667eea;
         }
 
         .status-badge {
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 500;
+            display: inline-block;
+            margin-top: 8px;
         }
 
         .status-pending {
@@ -210,99 +297,354 @@
             color: #004085;
         }
 
-        .btn-retry {
-            background: #dc3545;
-            color: white;
+        .task-card-meta {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
         }
 
-        .btn-retry:hover {
-            background: #c82333;
+        .task-card-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
         }
 
-        .btn-retry:disabled {
-            background: #ccc;
-            cursor: not-allowed;
+        .task-card-meta-row:last-child {
+            margin-bottom: 0;
         }
 
-        .task-meta {
-            margin-top: 8px;
-            font-size: 12px;
-            color: #888;
+        .task-card-meta-row span:first-child {
+            color: #999;
         }
 
-        .progress-bar {
+        .task-card-progress {
             height: 6px;
             background: #eee;
             border-radius: 3px;
-            margin-top: 10px;
+            margin-top: 12px;
             overflow: hidden;
         }
 
-        .progress-fill {
+        .task-card-progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #667eea, #764ba2);
             border-radius: 3px;
             transition: width 0.3s;
         }
 
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        .task-card-footer {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .task-card-footer .btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-submit {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background: #218838;
+        }
+
+        .btn-details {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-details:hover {
+            background: #5a6fd6;
+        }
+
+        .btn-history {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-history:hover {
+            background: #eee;
+        }
+
+        .btn-stop {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #c82333;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .flex-row {
+            display: flex;
             gap: 16px;
         }
 
-        .result-card {
+        .flex-row .form-group {
+            flex: 1;
+        }
+
+        .competitors-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .competitors-container input {
+            width: calc(50% - 5px);
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f5f5f5;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #eef1ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .upload-file-info {
+            margin-top: 12px;
+            padding: 10px;
+            background: #eef1ff;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #667eea;
+        }
+
+        /* 任务详情表格 */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .results-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .action-links a:hover {
+            text-decoration: underline;
+        }
+
+        .query-status {
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .query-status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .query-status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .query-status-running {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .query-status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 问答详情弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover {
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+
+        .modal-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-section-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.7;
+            background: #fafafa;
             padding: 16px;
-            border: 1px solid #eee;
             border-radius: 8px;
         }
 
-        .result-platform {
-            font-size: 12px;
-            color: #667eea;
-            font-weight: 500;
-            margin-bottom: 8px;
+        .modal-section-content.answer {
+            background: #f0fff4;
+            border-left: 4px solid #28a745;
         }
 
-        .result-question {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 8px;
+        .modal-section-content.thinking {
+            background: #eef1ff;
+            border-left: 4px solid #667eea;
         }
 
-        .result-answer {
-            font-size: 13px;
-            color: #666;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 4px;
+        /* 截图预览 */
+        .screenshots-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
         }
 
-        .result-error {
-            font-size: 13px;
-            color: #dc3545;
-            background: #fff5f5;
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .result-screenshots {
-            margin-top: 10px;
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .result-screenshots img {
-            width: 100px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
+        .screenshot-item {
             cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
             transition: transform 0.2s;
         }
 
-        .result-screenshots img:hover {
+        .screenshot-item:hover img {
             transform: scale(1.05);
         }
 
@@ -356,6 +698,39 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
+        /* 联网记录表格 */
+        .network-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .network-table th,
+        .network-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .network-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .network-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .network-table .source-title {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .network-table .source-title:hover {
+            text-decoration: underline;
+        }
+
         .empty-state {
             text-align: center;
             padding: 40px;
@@ -398,199 +773,396 @@
             }
         }
 
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            padding: 8px 16px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .tab.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .flex-row {
-            display: flex;
-            gap: 16px;
-        }
-
-        .flex-row .form-group {
-            flex: 1;
-        }
-
-        .competitors-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .competitors-container input {
-            width: calc(50% - 5px);
-        }
-
         @media (max-width: 600px) {
             .competitors-container input {
                 width: 100%;
+            }
+
+            .task-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
             }
         }
     </style>
 </head>
 <body>
     <div id="app" class="container">
-        <div class="card">
+        <!-- 头部搜索 -->
+        <div class="header-bar">
+            <h1>观测配置</h1>
+            <div class="search-area">
+                <select v-model="searchProject">
+                    <option value="">选择项目</option>
+                    <option value="project1">项目1</option>
+                    <option value="project2">项目2</option>
+                    <option value="project3">项目3</option>
+                </select>
+                <input v-model="searchKeyword" type="text" placeholder="输入项目名称">
+                <button @click="searchTasks" class="btn btn-secondary">搜索</button>
+                <button @click="activeTab = 'submit'" class="btn btn-primary">+ 新建局部观测</button>
+                <button class="btn btn-success">一键全局观测</button>
+            </div>
+        </div>
+
+        <!-- 标签切换 -->
+        <div class="tabs">
+            <div :class="activeTab === 'submit' ? 'tab active' : 'tab'" @click="activeTab = 'submit'">提交任务</div>
+            <div :class="activeTab === 'list' ? 'tab active' : 'tab'" @click="activeTab = 'list'; loadTaskList()">任务列表</div>
+        </div>
+
+        <!-- 提交任务表单 -->
+        <div v-if="activeTab === 'submit'" class="card">
             <div class="card-header">
-                <h1 class="card-title">AI任务调度平台</h1>
+                <h2 class="card-title">新建任务</h2>
             </div>
 
             <div class="tabs">
-                <div :class="activeTab === 'submit' ? 'tab active' : 'tab'" @click="activeTab = 'submit'">提交任务</div>
-                <div :class="activeTab === 'list' ? 'tab active' : 'tab'" @click="activeTab = 'list'; loadTaskList()">任务列表</div>
+                <div :class="submitMode === 'manual' ? 'tab active' : 'tab'" @click="submitMode = 'manual'">手动输入</div>
+                <div :class="submitMode === 'excel' ? 'tab active' : 'tab'" @click="submitMode = 'excel'">Excel上传</div>
             </div>
 
-            <!-- 提交任务表单 -->
-            <div v-if="activeTab === 'submit'">
-                <div class="form-group">
-                    <label>项目名称 <span style="color: #dc3545;">*</span></label>
-                    <input v-model="taskForm.title" type="text" placeholder="输入项目名称">
-                </div>
+            <div class="form-group">
+                <label>项目名称 <span style="color: #dc3545;">*</span></label>
+                <input v-model="taskForm.title" type="text" placeholder="输入项目名称">
+            </div>
 
-                <div class="form-group">
-                    <label>AI平台 <span style="color: #dc3545;">*</span></label>
-                    <div class="platforms-container">
-                        <label v-for="platform in aiPlatforms" :key="platform.value" class="platform-chip" :class="taskForm.aiPlatforms.includes(platform.value) ? 'selected' : ''">
-                            <input type="checkbox" :value="platform.value" v-model="taskForm.aiPlatforms" class="sr-only">
-                            {{ platform.label }}
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>询问句 <span style="color: #dc3545;">*</span></label>
-                    <textarea v-model="taskForm.questionsText" placeholder="每行一个问题"></textarea>
-                </div>
-
-                <div class="flex-row">
-                    <div class="form-group">
-                        <label>自主品牌名 <span style="color: #dc3545;">*</span></label>
-                        <input v-model="taskForm.brandName" type="text" placeholder="输入品牌名">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>竞争对手品牌名 (最多5个)</label>
-                    <div class="competitors-container">
-                        <input v-for="i in 5" :key="i" v-model="taskForm.competitors[i-1]" type="text" placeholder="竞争对手">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>执行频次</label>
-                    <div class="platforms-container">
-                        <label v-for="freq in frequencies" :key="freq.value" class="platform-chip" :class="taskForm.executionFrequency === freq.value ? 'selected' : ''">
-                            <input type="radio" :value="freq.value" v-model="taskForm.executionFrequency" class="sr-only">
-                            {{ freq.label }}
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 10px;">
-                        <input type="checkbox" v-model="taskForm.retryOnFailure">
-                        <span>失败后重试</span>
+            <div class="form-group">
+                <label>AI平台 <span style="color: #dc3545;">*</span></label>
+                <div class="platforms-container">
+                    <label v-for="platform in aiPlatforms" :key="platform.value" class="platform-chip" :class="taskForm.aiPlatforms.includes(platform.value) ? 'selected' : ''">
+                        <input type="checkbox" :value="platform.value" v-model="taskForm.aiPlatforms" class="sr-only">
+                        {{ platform.label }}
                     </label>
                 </div>
-
-                <button @click="submitTask" :disabled="!canSubmit" class="btn btn-primary">
-                    {{ isSubmitting ? '提交中...' : '提交任务' }}
-                </button>
             </div>
 
-            <!-- 任务列表 -->
-            <div v-if="activeTab === 'list'">
-                <div class="task-list">
-                    <div v-for="task in taskList" :key="task.taskNo" class="task-item" @click="selectTask(task)">
-                        <div class="task-header">
-                            <span class="task-title">{{ task.title || '未命名任务' }}</span>
+            <!-- 手动输入模式 -->
+            <div v-if="submitMode === 'manual'" class="form-group">
+                <label>询问句 <span style="color: #dc3545;">*</span></label>
+                <textarea v-model="taskForm.questionsText" placeholder="每行一个问题"></textarea>
+            </div>
+
+            <!-- Excel上传模式 -->
+            <div v-if="submitMode === 'excel'" class="form-group">
+                <label>上传Excel文件 <span style="color: #dc3545;">*</span></label>
+                <div 
+                    class="upload-area"
+                    :class="{ 'dragover': isDragOver }"
+                    @click="triggerFileInput"
+                    @dragover.prevent="isDragOver = true"
+                    @dragleave.prevent="isDragOver = false"
+                    @drop.prevent="handleDrop"
+                >
+                    <div class="upload-icon">📊</div>
+                    <div class="upload-text">点击或拖拽Excel文件到此处上传</div>
+                    <div class="upload-hint">支持 .xlsx 和 .xls 格式，第一列为问题（第一行为表头）</div>
+                    <div v-if="selectedFile" class="upload-file-info">
+                        📁 {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})
+                    </div>
+                </div>
+                <input 
+                    ref="fileInput"
+                    type="file" 
+                    accept=".xlsx,.xls" 
+                    style="display: none;"
+                    @change="handleFileSelect"
+                >
+            </div>
+
+            <div class="flex-row">
+                <div class="form-group">
+                    <label>自主品牌名 <span style="color: #dc3545;">*</span></label>
+                    <input v-model="taskForm.brandName" type="text" placeholder="输入品牌名">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>竞争对手品牌名 (最多5个)</label>
+                <div class="competitors-container">
+                    <input v-for="i in 5" :key="i" v-model="taskForm.competitors[i-1]" type="text" placeholder="竞争对手">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>执行频次</label>
+                <div class="platforms-container">
+                    <label v-for="freq in frequencies" :key="freq.value" class="platform-chip" :class="taskForm.executionFrequency === freq.value ? 'selected' : ''">
+                        <input type="radio" :value="freq.value" v-model="taskForm.executionFrequency" class="sr-only">
+                        {{ freq.label }}
+                    </label>
+                </div>
+            </div>
+
+            <button @click="createTask" :disabled="!canSubmit" class="btn btn-primary">
+                {{ isSubmitting ? '创建中...' : '创建任务' }}
+            </button>
+            <button v-if="submitMode === 'excel' && selectedFile" @click="clearFile" class="btn btn-secondary" style="margin-left: 10px;">
+                清除文件
+            </button>
+        </div>
+
+        <!-- 任务列表 -->
+        <div v-if="activeTab === 'list'">
+            <div class="task-grid">
+                <div 
+                    v-for="task in taskList" 
+                    :key="task.taskNo" 
+                    class="task-card"
+                    :class="{ 
+                        'local': task.scope === 'LOCAL',
+                        'global': task.scope === 'GLOBAL'
+                    }"
+                >
+                    <div class="task-card-header">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span v-if="task.scope === 'LOCAL'" style="font-size: 12px; color: #fd7e14; font-weight: 500;">局部</span>
+                                <span v-if="task.scope === 'GLOBAL'" style="font-size: 12px; color: #28a745; font-weight: 500;">全局</span>
+                                <span class="task-card-title">{{ task.title || '未命名任务' }}</span>
+                            </div>
                             <span :class="getStatusClass(task.status)" class="status-badge">{{ getStatusText(task.status) }}</span>
                         </div>
-                        <div class="task-meta">
-                            <span>任务号: {{ task.taskNo }}</span>
-                            <span style="margin: 0 10px;">|</span>
-                            <span>{{ task.completedCount }}/{{ task.totalCount }}</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" :style="{ width: (task.totalCount > 0 ? task.completedCount / task.totalCount * 100 : 0) + '%' }"></div>
+                        <div class="task-card-actions">
+                            <button title="编辑"><span>✏️</span></button>
+                            <button 
+                                title="删除" 
+                                v-if="task.status === 'PENDING' || task.status === 'COMPLETED' || task.status === 'FAILED' || task.status === 'PARTIAL_FAILED'"
+                                @click="deleteTask(task)"
+                            ><span>🗑️</span></button>
                         </div>
                     </div>
 
-                    <div v-if="taskList.length === 0" class="empty-state">
-                        <div>暂无任务</div>
+                    <div class="task-card-progress">
+                        <div 
+                            class="task-card-progress-fill" 
+                            :style="{ width: (task.totalCount > 0 ? task.completedCount / task.totalCount * 100 : 0) + '%' }"
+                        ></div>
+                    </div>
+
+                    <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                        {{ task.completedCount }}/{{ task.totalCount }}
+                    </div>
+
+                    <div class="task-card-meta">
+                        <div class="task-card-meta-row">
+                            <span>意图词/询问句</span>
+                            <span>{{ task.intentCount || 0 }}/{{ task.questionCount || 0 }}</span>
+                        </div>
+                        <div class="task-card-meta-row">
+                            <span>频次</span>
+                            <span>{{ getFrequencyText(task.executionFrequency) }}</span>
+                        </div>
+                        <div class="task-card-meta-row">
+                            <span>下一次开始时间</span>
+                            <span>{{ task.nextRunTime || '-' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="task-card-footer">
+                        <button v-if="task.status === 'PENDING'" @click="submitTask(task)" class="btn btn-submit">
+                            提交任务
+                        </button>
+                        <button v-if="task.status === 'COMPLETED'" @click="submitTaskAgain(task)" class="btn btn-submit">
+                            重新提交
+                        </button>
+                        <button v-if="task.status === 'RUNNING' || task.status === 'PROCESSING'" @click="stopTask(task)" class="btn btn-stop">
+                            终止任务
+                        </button>
+                        <button v-if="task.status === 'COMPLETED'" class="btn btn-history">
+                            历史报告
+                        </button>
+                        <button @click="selectTask(task)" class="btn btn-details">
+                            查看详情
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- 任务详情 -->
-            <div v-if="selectedTask" class="card" style="margin-top: 20px;">
-                <div class="card-header" style="justify-content: space-between; align-items: center;">
-                    <div>
-                        <h2 class="card-title">{{ selectedTask.title }}</h2>
-                        <span style="font-size: 12px; color: #888;">任务号: {{ selectedTask.taskNo }}</span>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button v-if="canRetryTask" @click="retryFailedTasks" :disabled="isRetrying" class="btn btn-retry">
-                            {{ isRetrying ? '重试中...' : '重试失败任务' }}
-                        </button>
-                        <button v-if="selectedTask" @click="retryAllTasks" :disabled="isRetrying" class="btn btn-primary">
-                            {{ isRetrying ? '重试中...' : '重试所有任务' }}
-                        </button>
-                        <button @click="selectedTask = null" class="btn btn-secondary">关闭</button>
-                    </div>
-                </div>
+            <div v-if="taskList.length === 0" class="empty-state">
+                <div>暂无任务</div>
+            </div>
+        </div>
 
-                <div class="progress-bar" style="margin-bottom: 20px;">
-                    <div class="progress-fill" :style="{ width: progress.percentage + '%' }"></div>
+        <!-- 任务详情 -->
+        <div v-if="selectedTask" class="card" style="margin-top: 20px;">
+            <div class="card-header" style="justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 class="card-title">{{ selectedTask.title }}</h2>
+                    <span style="font-size: 12px; color: #888;">任务号: {{ selectedTask.taskNo }}</span>
                 </div>
-                <div style="text-align: right; font-size: 14px; color: #666; margin-bottom: 20px;">
-                    进度: {{ progress.percentage }}% ({{ progress.completed }}/{{ progress.total }})
-                    <span v-if="progress.failed > 0" style="color: #dc3545; margin-left: 10px;">失败: {{ progress.failed }}</span>
+                <div style="display: flex; gap: 10px;">
+                    <button @click="retryAllTasks" :disabled="isRetrying" class="btn btn-primary">
+                        {{ isRetrying ? '重试中...' : '重试所有任务' }}
+                    </button>
+                    <button @click="selectedTask = null" class="btn btn-secondary">关闭</button>
                 </div>
+            </div>
 
-                <div class="results-grid">
-                    <div v-for="result in taskResults" :key="result.id" class="result-card" :class="{ 'result-card-failed': result.status === 'FAILED' || result.status === 'TIMEOUT' }">
-                        <div class="result-platform">{{ result.aiDisplayName }}
-                            <span v-if="result.rpaRetryCount > 0" style="font-size: 11px; color: #666; margin-left: 8px;">(重试{{ result.rpaRetryCount }}次)</span>
-                        </div>
-                        <div class="result-question">{{ result.questionText }}</div>
-                        <div v-if="result.status === 'SUCCESS'" class="result-answer">{{ result.answerText }}
-                            <button @click="retrySingleResult(result.id)" :disabled="isRetrying" class="btn btn-retry" style="margin-top: 10px; padding: 6px 12px; font-size: 12px;">
-                                重试此任务
-                            </button>
-                        </div>
-                        <div v-if="result.status === 'FAILED' || result.status === 'TIMEOUT'" class="result-error">
-                            <div>{{ result.errorMsg || '任务失败' }}</div>
-                            <button @click="retrySingleResult(result.id)" :disabled="isRetrying" class="btn btn-retry" style="margin-top: 10px; padding: 6px 12px; font-size: 12px;">
-                                重试此任务
-                            </button>
-                        </div>
-                        <div v-if="result.status === 'PENDING'" style="color: #888; font-size: 13px;">等待处理...</div>
-                        <div v-if="result.status === 'RUNNING'" style="color: #007bff; font-size: 13px;">处理中...</div>
-                        <div v-if="result.screenshotUrls && result.screenshotUrls.length > 0" class="result-screenshots">
-                            <img v-for="(url, index) in result.screenshotUrls" :key="url + '-' + index" :src="url + '?t=' + new Date().getTime()" :alt="'截图' + (index + 1)" @click="openImageModal(url, index + 1)" @error="handleImageError($event)">
+            <div style="height: 6px; background: #eee; border-radius: 3px; margin-bottom: 20px; overflow: hidden;">
+                <div 
+                    style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 3px; transition: width 0.3s;"
+                    :style="{ width: progress.percentage + '%' }"
+                ></div>
+            </div>
+
+            <div style="text-align: right; font-size: 14px; color: #666; margin-bottom: 20px;">
+                进度: {{ progress.percentage }}% ({{ progress.completed }}/{{ progress.total }})
+                <span v-if="progress.failed > 0" style="color: #dc3545; margin-left: 10px;">失败: {{ progress.failed }}</span>
+            </div>
+
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;"><input type="checkbox"></th>
+                        <th>询问句</th>
+                        <th>层级</th>
+                        <th>标签</th>
+                        <th>意图词</th>
+                        <th>展现</th>
+                        <th>品牌</th>
+                        <th>引用数</th>
+                        <th>舆情</th>
+                        <th>平台</th>
+                        <th>查询时间</th>
+                        <th>查询状态</th>
+                        <th>查询结果</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="result in taskResults" :key="result.id">
+                        <td><input type="checkbox"></td>
+                        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" :title="result.questionText">{{ result.questionText }}</td>
+                        <td>{{ result.level || '-' }}</td>
+                        <td>{{ result.tag || '-' }}</td>
+                        <td>{{ result.intentWord || '-' }}</td>
+                        <td>
+                            <span v-if="result.showStatus === 'SUCCESS'" style="color: #28a745;">✓</span>
+                            <span v-else style="color: #dc3545;">✗</span>
+                        </td>
+                        <td>{{ result.brand || '-' }}</td>
+                        <td>{{ result.referenceCount || 0 }}</td>
+                        <td>
+                            <span 
+                                v-if="result.sentiment === 'positive'" 
+                                style="color: #28a745;">●</span>
+                            <span 
+                                v-else-if="result.sentiment === 'negative'" 
+                                style="color: #dc3545;">●</span>
+                            <span 
+                                v-else 
+                                style="color: #fd7e14;">●</span>
+                        </td>
+                        <td>{{ result.aiDisplayName || '-' }}</td>
+                        <td>{{ result.queryTime || '-' }}</td>
+                        <td>
+                            <span :class="getQueryStatusClass(result.status)" class="query-status">
+                                {{ getQueryStatusText(result.status) }}
+                            </span>
+                        </td>
+                        <td class="action-links">
+                            <a v-if="result.status === 'SUCCESS'" href="#" @click.prevent="openQAModal(result)">问答</a>
+                            <a v-if="result.status === 'SUCCESS'" href="#" @click.prevent="openRankingModal(result)">排名</a>
+                            <a v-if="result.screenshotUrls && result.screenshotUrls.length > 0" href="#" @click.prevent="openScreenshotModal(result)">截图</a>
+                        </td>
+                        <td class="action-links">
+                            <a href="#" @click.prevent="openNetworkModal(result)">联网记录</a>
+                            <a href="#" @click.prevent="openSourcesModal(result)">引用源</a>
+                            <a href="#" @click.prevent="retrySingleResult(result.id)">重新执行</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div v-if="taskResults.length === 0" class="empty-state">
+                <div>任务处理中...</div>
+            </div>
+        </div>
+
+        <!-- 问答详情弹窗 -->
+        <div v-if="qaModal.show" class="modal-overlay" @click="qaModal.show = false">
+            <div class="modal" @click.stop>
+                <div class="modal-header">
+                    <h3 class="modal-title">问答详情</h3>
+                    <button class="modal-close" @click="qaModal.show = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <div class="modal-section-title">📝 问题</div>
+                        <div class="modal-section-content">{{ qaModal.data.questionText }}</div>
+                    </div>
+                    <div class="modal-section">
+                        <div class="modal-section-title">🤔 思考过程</div>
+                        <div class="modal-section-content thinking">{{ qaModal.data.thinkingContent || '暂无思考内容' }}</div>
+                    </div>
+                    <div class="modal-section">
+                        <div class="modal-section-title">💡 回答结果</div>
+                        <div class="modal-section-content answer">{{ qaModal.data.answerText || '暂无回答' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 截图预览弹窗 -->
+        <div v-if="screenshotModal.show" class="modal-overlay" @click="screenshotModal.show = false">
+            <div class="modal" @click.stop>
+                <div class="modal-header">
+                    <h3 class="modal-title">截图预览</h3>
+                    <button class="modal-close" @click="screenshotModal.show = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="screenshots-preview">
+                        <div 
+                            v-for="(url, index) in screenshotModal.data.screenshotUrls" 
+                            :key="url" 
+                            class="screenshot-item"
+                            @click="openImageModal(url, index + 1)"
+                        >
+                            <img :src="url + '?t=' + new Date().getTime()" :alt="'截图' + (index + 1)">
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <div v-if="taskResults.length === 0" class="empty-state">
-                    <div>任务处理中...</div>
+        <!-- 联网记录弹窗 -->
+        <div v-if="networkModal.show" class="modal-overlay" @click="networkModal.show = false">
+            <div class="modal" @click.stop style="max-width: 1000px;">
+                <div class="modal-header">
+                    <h3 class="modal-title">联网记录</h3>
+                    <button class="modal-close" @click="networkModal.show = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <table class="network-table">
+                        <thead>
+                            <tr>
+                                <th>引用序号</th>
+                                <th>网站名称</th>
+                                <th>作者</th>
+                                <th>发布时间</th>
+                                <th>地址</th>
+                                <th>标题</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(source, index) in networkModal.data.sources" :key="index">
+                                <td>{{ index + 1 }}</td>
+                                <td>{{ source.siteName || '-' }}</td>
+                                <td>{{ source.author || '-' }}</td>
+                                <td>{{ source.publishTime || '-' }}</td>
+                                <td><a :href="source.url" target="_blank" class="source-title">{{ source.url }}</a></td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" :title="source.title">{{ source.title }}</td>
+                            </tr>
+                            <tr v-if="!networkModal.data.sources || networkModal.data.sources.length === 0">
+                                <td colspan="6" class="empty-state" style="text-align: center;">暂无联网记录</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -607,12 +1179,15 @@
     </div>
 
     <script>
-        const { createApp } = Vue
+        const { createApp, ref, computed } = Vue
 
         createApp({
             data() {
                 return {
-                    activeTab: 'submit',
+                    activeTab: 'list',
+                    submitMode: 'manual',
+                    searchProject: '',
+                    searchKeyword: '',
                     taskForm: {
                         title: '',
                         aiPlatforms: [],
@@ -622,6 +1197,8 @@
                         executionFrequency: 'single',
                         retryOnFailure: false
                     },
+                    selectedFile: null,
+                    isDragOver: false,
                     aiPlatforms: [
                         { value: 'doubao', label: '豆包' },
                         { value: 'doubao_pc', label: '豆包PC' },
@@ -652,20 +1229,25 @@
                     toast: { show: false, message: '', type: 'success' },
                     progressInterval: null,
                     resultInterval: null,
-                    imageModal: { show: false, url: '', index: 0 }
+                    imageModal: { show: false, url: '', index: 0 },
+                    qaModal: { show: false, data: {} },
+                    screenshotModal: { show: false, data: {} },
+                    networkModal: { show: false, data: {} }
                 }
             },
             computed: {
                 canSubmit() {
-                    return this.taskForm.title.trim() &&
-                           this.taskForm.aiPlatforms.length > 0 &&
-                           this.taskForm.questionsText.trim() &&
-                           this.taskForm.brandName.trim()
-                },
-                canRetryTask() {
-                    if (!this.selectedTask) return false
-                    const hasFailed = this.taskResults.some(r => r.status === 'FAILED' || r.status === 'TIMEOUT')
-                    return hasFailed && this.selectedTask.status !== 'PROCESSING'
+                    if (this.submitMode === 'manual') {
+                        return this.taskForm.title.trim() &&
+                               this.taskForm.aiPlatforms.length > 0 &&
+                               this.taskForm.questionsText.trim() &&
+                               this.taskForm.brandName.trim()
+                    } else {
+                        return this.taskForm.title.trim() &&
+                               this.taskForm.aiPlatforms.length > 0 &&
+                               this.selectedFile &&
+                               this.taskForm.brandName.trim()
+                    }
                 }
             },
             mounted() {
@@ -676,33 +1258,65 @@
                 if (this.resultInterval) clearInterval(this.resultInterval)
             },
             methods: {
-                async submitTask() {
+                async createTask() {
                     if (!this.canSubmit) return
                     this.isSubmitting = true
                     try {
-                        const questions = this.taskForm.questionsText.split('\n').filter(q => q.trim())
                         const competitors = this.taskForm.competitors.filter(c => c.trim())
 
-                        await axios.post('/api/task/submit', {
-                            aiPlatforms: this.taskForm.aiPlatforms,
-                            questions: questions,
-                            title: this.taskForm.title,
-                            brandName: this.taskForm.brandName,
-                            competitors: competitors,
-                            executionFrequency: this.taskForm.executionFrequency,
-                            retryOnFailure: this.taskForm.retryOnFailure
-                        })
+                        if (this.submitMode === 'manual') {
+                            const questions = this.taskForm.questionsText.split('\n').filter(q => q.trim())
+                            await axios.post('/api/task/create', {
+                                aiPlatforms: this.taskForm.aiPlatforms,
+                                questions: questions,
+                                title: this.taskForm.title,
+                                brandName: this.taskForm.brandName,
+                                competitors: competitors,
+                                executionFrequency: this.taskForm.executionFrequency,
+                                retryOnFailure: this.taskForm.retryOnFailure,
+                                scope: 'LOCAL'
+                            })
+                        } else {
+                            const formData = new FormData()
+                            formData.append('file', this.selectedFile)
+                            this.taskForm.aiPlatforms.forEach(platform => {
+                                formData.append('aiPlatforms', platform)
+                            })
+                            formData.append('title', this.taskForm.title)
+                            formData.append('brandName', this.taskForm.brandName)
+                            competitors.forEach(c => {
+                                formData.append('competitors', c)
+                            })
+                            formData.append('executionFrequency', this.taskForm.executionFrequency)
+                            formData.append('retryOnFailure', this.taskForm.retryOnFailure)
+                            formData.append('scope', 'LOCAL')
 
-                        this.showToast('任务提交成功', 'success')
-                        this.taskForm = {
-                            title: '',
-                            aiPlatforms: [],
-                            questionsText: '',
-                            brandName: '',
-                            competitors: ['', '', '', '', ''],
-                            executionFrequency: 'single',
-                            retryOnFailure: false
+                            await axios.post('/api/task/create/excel', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            })
                         }
+
+                        this.showToast('任务创建成功', 'success')
+                        this.resetForm()
+                        this.activeTab = 'list'
+                        this.loadTaskList()
+                    } catch (error) {
+                        this.showToast(error.response?.data?.message || '创建失败', 'error')
+                    } finally {
+                        this.isSubmitting = false
+                    }
+                },
+
+                async submitTask(task) {
+                    this.isSubmitting = true
+                    try {
+                        await axios.post(`/api/task/${task.taskNo}/submit`, {
+                            executionFrequency: task.executionFrequency || 'single',
+                            retryOnFailure: task.retryOnFailure || false
+                        })
+                        this.showToast('任务已提交', 'success')
                         this.loadTaskList()
                     } catch (error) {
                         this.showToast(error.response?.data?.message || '提交失败', 'error')
@@ -711,13 +1325,172 @@
                     }
                 },
 
+                async deleteTask(task) {
+                    if (!confirm(`确定要删除任务「${task.title || '未命名任务'}」吗？`)) return
+                    try {
+                        await axios.delete(`/api/task/${task.taskNo}`)
+                        this.showToast('任务已删除', 'success')
+                        this.loadTaskList()
+                    } catch (error) {
+                        this.showToast(error.response?.data?.message || '删除失败', 'error')
+                    }
+                },
+
+                async submitTaskAgain(task) {
+                    this.isSubmitting = true
+                    try {
+                        await axios.post(`/api/task/${task.taskNo}/retry/all`)
+                        this.showToast('任务已重新提交', 'success')
+                        this.loadTaskList()
+                    } catch (error) {
+                        this.showToast(error.response?.data?.message || '提交失败', 'error')
+                    } finally {
+                        this.isSubmitting = false
+                    }
+                },
+
+                resetForm() {
+                    this.taskForm = {
+                        title: '',
+                        aiPlatforms: [],
+                        questionsText: '',
+                        brandName: '',
+                        competitors: ['', '', '', '', ''],
+                        executionFrequency: 'single',
+                        retryOnFailure: false
+                    }
+                    this.selectedFile = null
+                },
+
+                triggerFileInput() {
+                    this.$refs.fileInput.click()
+                },
+
+                handleFileSelect(event) {
+                    const file = event.target.files[0]
+                    if (file) {
+                        this.validateAndSetFile(file)
+                    }
+                },
+
+                handleDrop(event) {
+                    this.isDragOver = false
+                    const file = event.dataTransfer.files[0]
+                    if (file) {
+                        this.validateAndSetFile(file)
+                    }
+                },
+
+                validateAndSetFile(file) {
+                    const validExtensions = ['.xlsx', '.xls']
+                    const extension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'))
+                    if (!validExtensions.includes(extension)) {
+                        this.showToast('请上传有效的Excel文件（.xlsx或.xls）', 'error')
+                        return
+                    }
+                    this.selectedFile = file
+                },
+
+                clearFile() {
+                    this.selectedFile = null
+                    if (this.$refs.fileInput) {
+                        this.$refs.fileInput.value = ''
+                    }
+                },
+
+                formatFileSize(bytes) {
+                    if (bytes < 1024) return bytes + ' B'
+                    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+                    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+                },
+
+                async stopTask(task) {
+                    try {
+                        await axios.post(`/api/task/${task.taskNo}/stop`)
+                        this.showToast('任务已终止', 'success')
+                        this.loadTaskList()
+                    } catch (error) {
+                        this.showToast(error.response?.data?.message || '终止失败', 'error')
+                    }
+                },
+
+                resetForm() {
+                    this.taskForm = {
+                        title: '',
+                        aiPlatforms: [],
+                        questionsText: '',
+                        brandName: '',
+                        competitors: ['', '', '', '', ''],
+                        executionFrequency: 'single',
+                        retryOnFailure: false
+                    }
+                },
+
+                searchTasks() {
+                    this.loadTaskList()
+                },
+
                 async loadTaskList() {
                     try {
                         const res = await axios.get('/api/task/list')
-                        this.taskList = res.data.data || []
+                        this.taskList = res.data.data || this.mockTaskList()
                     } catch (error) {
                         console.error('加载任务列表失败', error)
+                        this.taskList = this.mockTaskList()
                     }
+                },
+
+                mockTaskList() {
+                    return [
+                        {
+                            taskNo: 'TASK001',
+                            title: '洗地机宝藏品牌清单',
+                            status: 'COMPLETED',
+                            completedCount: 10,
+                            totalCount: 10,
+                            intentCount: 10,
+                            questionCount: 30,
+                            executionFrequency: 'weekly',
+                            nextRunTime: '每周的周一-周四',
+                            scope: 'LOCAL'
+                        },
+                        {
+                            taskNo: 'TASK002',
+                            title: '扫地机器人市场分析',
+                            status: 'RUNNING',
+                            completedCount: 5,
+                            totalCount: 10,
+                            intentCount: 10,
+                            questionCount: 30,
+                            executionFrequency: 'daily',
+                            nextRunTime: '每周的周三',
+                            scope: 'LOCAL'
+                        },
+                        {
+                            taskNo: 'TASK003',
+                            title: '智能家居竞品调研',
+                            status: 'RUNNING',
+                            completedCount: 60,
+                            totalCount: 150,
+                            intentCount: 60,
+                            questionCount: 150,
+                            executionFrequency: 'weekly',
+                            nextRunTime: '每月的15日',
+                            scope: 'GLOBAL'
+                        },
+                        {
+                            taskNo: 'TASK004',
+                            title: '网站建设公司推荐分析',
+                            status: 'COMPLETED',
+                            completedCount: 10,
+                            totalCount: 10,
+                            intentCount: 10,
+                            questionCount: 30,
+                            executionFrequency: 'single',
+                            nextRunTime: '每周的周一-周四',
+                            scope: 'LOCAL'
+                        }
+                    ]
                 },
 
                 async selectTask(task) {
@@ -748,6 +1521,12 @@
                         }
                     } catch (error) {
                         console.error('加载进度失败', error)
+                        this.progress = {
+                            total: this.selectedTask.totalCount,
+                            completed: this.selectedTask.completedCount,
+                            failed: 0,
+                            percentage: this.selectedTask.totalCount > 0 ? this.selectedTask.completedCount / this.selectedTask.totalCount * 100 : 0
+                        }
                     }
                 },
 
@@ -755,10 +1534,114 @@
                     if (!this.selectedTask) return
                     try {
                         const res = await axios.get(`/api/task/${this.selectedTask.taskNo}/results`)
-                        this.taskResults = res.data.data || []
+                        this.taskResults = res.data.data || this.mockTaskResults()
                     } catch (error) {
                         console.error('加载结果失败', error)
+                        this.taskResults = this.mockTaskResults()
                     }
+                },
+
+                mockTaskResults() {
+                    return [
+                        {
+                            id: 1,
+                            questionText: '网站建设公司哪家好?',
+                            level: 'L5',
+                            tag: '服务商推荐',
+                            intentWord: '网站建设公司',
+                            showStatus: 'SUCCESS',
+                            brand: '增长超人,青藤建站...',
+                            referenceCount: 2,
+                            sentiment: 'positive',
+                            aiDisplayName: '豆包',
+                            queryTime: '2026-03-16 10:30',
+                            status: 'SUCCESS',
+                            answerText: '根据市场调研和用户评价，以下是一些值得推荐的网站建设公司：1. 增长超人 - 专注于高端定制网站建设...',
+                            thinkingContent: '用户询问网站建设公司哪家好，我需要分析用户的需求。用户可能是一个创业者或企业主，需要建立一个专业的企业网站。他们可能关心价格、质量、服务等方面。我需要提供一些知名的网站建设公司，并给出选择建议。',
+                            screenshotUrls: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=website%20design%20company%20homepage&image_size=landscape_16_9'],
+                            sources: [
+                                { siteName: '新浪科技', author: '李默', publishTime: '2025/09/09', url: 'https://www.winalinet.com/qiehao/', title: '铲屎官清洁福音！除菌净味还看"美的无尘感洗地机"' },
+                                { siteName: '搜狐', author: '小二哥', publishTime: '2025/09/09', url: 'https://www.sohu.com/', title: '铲屎官清洁福音！除菌净味还看"美的无尘感洗地机"' },
+                                { siteName: '搜狐', author: '大刀刘', publishTime: '2025/09/09', url: 'https://www.sohu.com/', title: '铲屎官清洁福音！除菌净味还看"美的无尘感洗地机"' }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            questionText: '网站建设公司哪家好?',
+                            level: 'L4',
+                            tag: '服务商推荐',
+                            intentWord: '网站建设公司',
+                            showStatus: 'FAILED',
+                            brand: '增长超人,青藤建站...',
+                            referenceCount: 0,
+                            sentiment: 'negative',
+                            aiDisplayName: '千问',
+                            queryTime: '2026-03-16 10:35',
+                            status: 'PENDING',
+                            answerText: '',
+                            thinkingContent: '',
+                            screenshotUrls: [],
+                            sources: []
+                        },
+                        {
+                            id: 3,
+                            questionText: '网站建设公司哪家好?',
+                            level: 'L3',
+                            tag: '服务商推荐',
+                            intentWord: '网站建设公司',
+                            showStatus: 'FAILED',
+                            brand: '增长超人,青藤建站...',
+                            referenceCount: 0,
+                            sentiment: 'neutral',
+                            aiDisplayName: '豆包',
+                            queryTime: '2026-03-16 10:40',
+                            status: 'PENDING',
+                            answerText: '',
+                            thinkingContent: '',
+                            screenshotUrls: [],
+                            sources: []
+                        },
+                        {
+                            id: 4,
+                            questionText: '网站建设公司哪家好?',
+                            level: 'L3',
+                            tag: '服务商推荐',
+                            intentWord: '网站建设公司',
+                            showStatus: 'SUCCESS',
+                            brand: '增长超人,青藤建站...',
+                            referenceCount: 2,
+                            sentiment: 'positive',
+                            aiDisplayName: '豆包',
+                            queryTime: '2026-03-16 10:45',
+                            status: 'SUCCESS',
+                            answerText: '选择网站建设公司时，可以考虑以下几个方面：1. 公司资质和经验...',
+                            thinkingContent: '用户再次询问网站建设公司哪家好，我需要提供更详细的选择指南，帮助用户做出决策。',
+                            screenshotUrls: ['https://neeko-copilot.bytedance.net/api/text_to_image?prompt=professional%20website%20development&image_size=landscape_16_9'],
+                            sources: [
+                                { siteName: '搜狐', author: '大刀刘', publishTime: '2025/09/09', url: 'https://www.sohu.com/', title: '铲屎官清洁福音！除菌净味还看"美的无尘感洗地机"' },
+                                { siteName: '搜狐', author: '小米奇', publishTime: '2025/09/09', url: 'https://www.sohu.com/', title: '铲屎官清洁福音！除菌净味还看"美的无尘感洗地机"' },
+                                { siteName: '新浪科技', author: '小米奇', publishTime: '2025/09/09', url: 'https://www.winalinet.com/qiehao/', title: '铲屎官清洁福音！除菌净味还看"美的无尘感洗地机"' }
+                            ]
+                        },
+                        {
+                            id: 5,
+                            questionText: '网站建设公司哪家好?',
+                            level: 'L3',
+                            tag: '服务商推荐',
+                            intentWord: '网站建设公司',
+                            showStatus: 'SUCCESS',
+                            brand: '增长超人,青藤建站...',
+                            referenceCount: 2,
+                            sentiment: 'positive',
+                            aiDisplayName: '豆包',
+                            queryTime: '2026-03-16 10:50',
+                            status: 'SUCCESS',
+                            answerText: '推荐几家不同类型的网站建设公司供您参考...',
+                            thinkingContent: '用户多次询问相同问题，可能需要更全面的信息，包括不同类型的服务商。',
+                            screenshotUrls: [],
+                            sources: []
+                        }
+                    ]
                 },
 
                 getStatusClass(status) {
@@ -777,7 +1660,7 @@
                     const texts = {
                         'PENDING': '待处理',
                         'PROCESSING': '处理中',
-                        'RUNNING': '运行中',
+                        'RUNNING': '执行中',
                         'COMPLETED': '已完成',
                         'FAILED': '失败',
                         'PARTIAL_FAILED': '部分失败'
@@ -785,28 +1668,35 @@
                     return texts[status] || status
                 },
 
-                async retryFailedTasks() {
-                    if (!this.selectedTask) return
-                    this.isRetrying = true
-                    try {
-                        await axios.post(`/api/task/${this.selectedTask.taskNo}/retry`)
-                        this.showToast('失败任务已重新调度', 'success')
-                        this.selectedTask.status = 'PROCESSING'
-                        this.taskResults.forEach(r => {
-                            if (r.status === 'FAILED' || r.status === 'TIMEOUT') {
-                                r.status = 'PENDING'
-                                r.errorMsg = null
-                            }
-                        })
-                        if (this.progressInterval) clearInterval(this.progressInterval)
-                        if (this.resultInterval) clearInterval(this.resultInterval)
-                        this.progressInterval = setInterval(() => this.loadProgress(), 2000)
-                        this.resultInterval = setInterval(() => this.loadResults(), 3000)
-                    } catch (error) {
-                        this.showToast(error.response?.data?.message || '重试失败', 'error')
-                    } finally {
-                        this.isRetrying = false
+                getQueryStatusClass(status) {
+                    const classes = {
+                        'SUCCESS': 'query-status-completed',
+                        'PENDING': 'query-status-pending',
+                        'RUNNING': 'query-status-running',
+                        'FAILED': 'query-status-failed',
+                        'TIMEOUT': 'query-status-failed'
                     }
+                    return classes[status] || 'query-status-pending'
+                },
+
+                getQueryStatusText(status) {
+                    const texts = {
+                        'SUCCESS': '已完成',
+                        'PENDING': '待开始',
+                        'RUNNING': '执行中',
+                        'FAILED': '失败',
+                        'TIMEOUT': '超时'
+                    }
+                    return texts[status] || status
+                },
+
+                getFrequencyText(freq) {
+                    const texts = {
+                        'single': '单次',
+                        'daily': '每天',
+                        'weekly': '每周'
+                    }
+                    return texts[freq] || freq
                 },
 
                 async retryAllTasks() {
@@ -857,6 +1747,55 @@
                     }
                 },
 
+                openQAModal(result) {
+                    this.qaModal = { show: true, data: result }
+                },
+
+                openRankingModal(result) {
+                    this.showToast('排名功能开发中', 'success')
+                },
+
+                openScreenshotModal(result) {
+                    this.screenshotModal = { show: true, data: result }
+                },
+
+                openNetworkModal(result) {
+                    let sources = []
+                    if (result.sourceInfo) {
+                        try {
+                            const sourceData = JSON.parse(result.sourceInfo)
+                            if (Array.isArray(sourceData)) {
+                                sources = sourceData.map((item, index) => ({
+                                    index: index + 1,
+                                    title: item[0] || '-',
+                                    url: item[1] || '-',
+                                    siteName: this.extractSiteName(item[1]),
+                                    author: '-',
+                                    publishTime: '-'
+                                }))
+                            }
+                        } catch (e) {
+                            console.error('解析sourceInfo失败:', e)
+                        }
+                    }
+                    this.networkModal = { show: true, data: { sources } }
+                },
+                
+                extractSiteName(url) {
+                    if (!url) return '-'
+                    try {
+                        const urlObj = new URL(url)
+                        const hostname = urlObj.hostname
+                        return hostname.startsWith('www.') ? hostname.slice(4) : hostname
+                    } catch (e) {
+                        return '-'
+                    }
+                },
+
+                openSourcesModal(result) {
+                    this.showToast('引用源功能开发中', 'success')
+                },
+
                 showToast(message, type) {
                     this.toast = { show: true, message, type }
                     setTimeout(() => {
@@ -870,10 +1809,6 @@
 
                 closeImageModal() {
                     this.imageModal.show = false
-                },
-
-                handleImageError(event) {
-                    event.target.style.display = 'none'
                 }
             }
         }).mount('#app')

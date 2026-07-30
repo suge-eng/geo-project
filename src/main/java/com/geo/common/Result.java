@@ -21,6 +21,13 @@ public class Result<T> {
         return result;
     }
 
+    public static <T> Result<T> success(String message) {
+        Result<T> result = new Result<>();
+        result.code = ResultCode.SUCCESS.getCode();
+        result.message = message;
+        return result;
+    }
+
     public static <T> Result<T> success(String message, T data) {
         Result<T> result = new Result<>();
         result.code = ResultCode.SUCCESS.getCode();

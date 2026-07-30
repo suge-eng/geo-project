@@ -15,6 +15,8 @@ public class TaskResult {
     private String aiPlatform;
     private String questionText;
     private String answerText;
+    private String thinkingContent;
+    private String sourceInfo;
     private String screenshotUrls;
     private String status;
     private String errorMsg;
@@ -41,6 +43,10 @@ public class TaskResult {
     public void setQuestionText(String questionText) { this.questionText = questionText; }
     public String getAnswerText() { return answerText; }
     public void setAnswerText(String answerText) { this.answerText = answerText; }
+    public String getThinkingContent() { return thinkingContent; }
+    public void setThinkingContent(String thinkingContent) { this.thinkingContent = thinkingContent; }
+    public String getSourceInfo() { return sourceInfo; }
+    public void setSourceInfo(String sourceInfo) { this.sourceInfo = sourceInfo; }
     public String getScreenshotUrls() { return screenshotUrls; }
     public void setScreenshotUrls(String screenshotUrls) { this.screenshotUrls = screenshotUrls; }
     public String getStatus() { return status; }

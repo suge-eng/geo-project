@@ -201,6 +201,20 @@ public class RpaCallbackController {
         targetResult.setDurationMs(durationMs);
         targetResult.setCompletedAt(LocalDateTime.now());
 
+        String answerText = (String) request.get("answerText");
+        String thinkingContent = (String) request.get("thinkingContent");
+        String sourceInfo = (String) request.get("sourceInfo");
+        
+        if (answerText != null) {
+            targetResult.setAnswerText(answerText);
+        }
+        if (thinkingContent != null) {
+            targetResult.setThinkingContent(thinkingContent);
+        }
+        if (sourceInfo != null) {
+            targetResult.setSourceInfo(sourceInfo);
+        }
+
         if (screenshotUrls != null && !screenshotUrls.isEmpty()) {
             try {
                 targetResult.setScreenshotUrls(objectMapper.writeValueAsString(screenshotUrls));
